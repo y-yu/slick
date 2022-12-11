@@ -190,10 +190,10 @@ object AsyncExecutor extends Logging {
         override def priority() = _priority
         val setConnectionReleased = new PrioritizedRunnable.SetConnectionReleased(() => connectionReleased = true)
         override def run() =
-          queue match {
+          (queue: Any) match {
             // If the runnable/task is a low/medium priority item, we increase the items in use count,
             // because first thing it will do is open a Jdbc connection from the pool.
-            case q: ManagedArrayBlockingQueue[Runnable] if priority() != WithConnection =>
+            case q: ManagedArrayBlockingQueue if priority() != WithConnection =>
               if (q.attemptPrepare(this)) {
                 try _run(setConnectionReleased)
                 finally
